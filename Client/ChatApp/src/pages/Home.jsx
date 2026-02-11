@@ -22,6 +22,7 @@ const Home = () => {
     //     </div>
     //   )
     // }
+
     useEffect(()=>{
         const fun1 = async ()=>{
             try{
@@ -59,6 +60,7 @@ const Home = () => {
         }
         fun2();
     },[])
+
     useEffect(()=>{
         const s = createSocket();
         setSocket(s);
@@ -66,26 +68,50 @@ const Home = () => {
         s.on("receive_private_message", (data)=>{
             setChat((prev)=>[...prev, data]);
         })
-        return s.disconnect();
+        // return s.disconnect();
+        return () => {
+            s.disconnect();
+        };
     },[])
-    const setUser = (id)=>{
-        setSelectedUser(users.find((a,b)=>{
-            return id == b;
-        }));
+
+    const setUser = async (user)=>{
+        setSelectedUser(user);
+        const token = localStorage.getItem("Token");
+        try{
+            // const res = await axios.get(`${API_BASE_URL}/chatdata/chat?from=${userData._id}&to=${selected._id}`, {headers:{"Authorization":token}});
+            const res = await axios.get(`${API_BASE_URL}/chatdata/chat/${user._id}`,{headers:{"Authorization":token}});
+            if(res.status == 200)
+                setChat(res.data);
+        }
+        catch(error){
+            console.log("Some Error Occured", error);
+        }
     }
+
     const logOut = () => {
         localStorage.removeItem("Token");
         navigate('/');
     }
-    const send = ()=>{
+
+    const send = async ()=>{
         if(!message || !selectedUser){
             return;
         }
-        socket.emit("private_message", {
-            to: selectedUser,
-            message
-        })
-        setChat((prev)=>[...prev, {from: me, message}])
+        try{
+            socket.emit("private_message", {
+                to: selectedUser._id,
+                message
+            })
+            const token = localStorage.getItem("Token");
+            const res = await axios.post(`${API_BASE_URL}/chatdata/savechat`, {from: userData._id, to: selectedUser._id, message}, {headers:{"Authorization":token}})
+            if(res.status == 200){
+                console.log(res.data);
+            }
+        }
+        catch(error){
+            console.log("Some Error Occured", error);
+        }
+        setChat((prev)=>[...prev, {from: userData._id, message}])
         setMessage("");
     }
     return (
@@ -97,9 +123,12 @@ const Home = () => {
             </div>
             <div className='w-full h-[90%] flex flex-col items-center'>
                 {
-                    users.map((a,b)=>{
+                    users.map((a)=>{
                         return (
-                            <div className='w-full h-[50px] border flex items-center pl-5 font-bold text-xl cursor-pointer' onClick={()=>setUser(b)}>
+                            <div className='w-full h-[50px] border flex items-center pl-5 font-bold text-xl cursor-pointer gap-[10px]' onClick={()=>setUser(a)}>
+                                <div className='w-[35px] h-[35px] bg-gray-500 flex justify-center items-center rounded-[50%] text-white'>
+                                    {a.userName.charAt(0).toUpperCase()}
+                                </div>
                                 <h2>{a.userName}</h2>
                             </div>
                         )
@@ -111,12 +140,13 @@ const Home = () => {
             <div className='w-full h-[10%] pl-[20px] flex items-center bg-blue-700'>
                 <h1 className='text-xl text-white'>{selectedUser ? selectedUser.userName : "Select A User"}</h1>
             </div>
-            <div className='w-full h-[80%]'>
+            <div className='w-full h-[80%] flex flex-col gap-[2px] p-[10px] overflow-y-scroll'>
                 {
                     chat.map((a, b)=>{
                         return (
-                            <>
-                            </>
+                            <div className={`w-max max-w-[50%] rounded-[8px] ${a.from === userData._id ? 'self-end bg-blue-400' : 'self-start bg-gray-400'}`}>
+                                <p className={`text-white p-2 max-w-full text-wrap`}>{a.message}</p>
+                            </div>
                         )
                     })
                 }
@@ -124,7 +154,7 @@ const Home = () => {
             {
                 selectedUser ? 
                 <div className='w-full h-[10%] flex justify-between items-center border'>
-                    <input type="text" placeholder='Enter your message' className='w-[80%] h-[80%] border box-border rounded-[8px] pl-4 outline-blue-600' name='message' value={message} onChange={(e)=>setMessage(e.target.value)}/>
+                    <input type="text" placeholder='Enter your message' className='w-[80%] h-[80%] border box-border rounded-[8px] px-4 outline-blue-600' name='message' value={message} onChange={(e)=>setMessage(e.target.value)}/>
                     <button className='w-[100px] h-[80%] border rounded-[8px] bg-blue-600 text-white font-semibold text-xl' onClick={send}>Send</button>
                 </div>
                 :

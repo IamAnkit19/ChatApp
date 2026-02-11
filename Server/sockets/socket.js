@@ -15,13 +15,13 @@ module.exports = (io) =>{
         }
     })
     io.on("connection", (socket)=>{
-        onlineUsers[socket.user.userName] = socket.id;
+        onlineUsers[socket.user._id] = socket.id;
         io.emit("online_users", Object.keys(onlineUsers));
         socket.on("private_message", ({to, message})=>{
             const targetId = onlineUsers[to];
             if(targetId){
                 io.to(targetId).emit("receive_private_message", {
-                    from: socket.user.userName,
+                    from: socket.user._id,
                     message
                 })
             }

@@ -1,7 +1,8 @@
 const express = require('express');
 const db = require('./config/db');
 const router = require('./controllers/authController');
-const userData = require('./routers/userData')
+const userData = require('./routers/userData');
+const chatData = require('./routers/chatData');
 let app = express();
 const cors = require('cors');
 const http = require('http');
@@ -17,6 +18,7 @@ app.use(cors({
 app.use(express.json())
 app.use('/api',router);
 app.use('/userdata', userData);
+app.use('/chatdata', chatData);
 // console.log(router);
 
 const server = http.createServer(app);
