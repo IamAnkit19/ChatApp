@@ -114,18 +114,23 @@ const Home = () => {
         setChat((prev)=>[...prev, {from: userData._id, message}])
         setMessage("");
     }
+    const handleSend = (e)=>{
+        if(e.key == "Enter"){
+            send();
+        }
+    }
     return (
     <div className='w-full h-full flex'>
         <div className='w-[30%] h-full border-r box-border'>
-            <div className='w-full h-[10%] flex justify-around items-center bg-blue-700'>
+            <div className='w-full h-[10%] flex justify-around items-center bg-blue-500'>
                 <h1 className='text-xl text-white font-bold'>{userData.userName}</h1>
                 <button className=' font-bold w-[100px] h-[40px] bg-white rounded-[10px]' onClick={logOut}>Logout</button>
             </div>
-            <div className='w-full h-[90%] flex flex-col items-center'>
+            <div className='w-full h-[90%] flex flex-col items-center gap-[2px] bg-cyan-50'>
                 {
                     users.map((a)=>{
                         return (
-                            <div className='w-full h-[50px] border flex items-center pl-5 font-bold text-xl cursor-pointer gap-[10px]' onClick={()=>setUser(a)}>
+                            <div className='w-full h-[50px] border rounded-[8px] flex items-center pl-5 font-semibold text-xl cursor-pointer gap-[10px] bg-fuchsia-50' onClick={()=>setUser(a)}>
                                 <div className='w-[35px] h-[35px] bg-gray-500 flex justify-center items-center rounded-[50%] text-white'>
                                     {a.userName.charAt(0).toUpperCase()}
                                 </div>
@@ -137,10 +142,18 @@ const Home = () => {
             </div>
         </div>
         <div className='w-[70%] h-full'>
-            <div className='w-full h-[10%] pl-[20px] flex items-center bg-blue-700'>
+            <div className='w-full h-[10%] pl-[20px] flex items-center bg-blue-500 gap-[10px]'>
+                {
+                    selectedUser ? 
+                    <div className='w-[35px] h-[35px] bg-gray-500 flex justify-center items-center rounded-[50%] text-white'>
+                        {selectedUser.userName.charAt(0).toUpperCase()}
+                    </div>
+                    :
+                    <></>
+                }
                 <h1 className='text-xl text-white'>{selectedUser ? selectedUser.userName : "Select A User"}</h1>
             </div>
-            <div className='w-full h-[80%] flex flex-col gap-[2px] p-[10px] overflow-y-scroll'>
+            <div className='w-full h-[80%] flex flex-col gap-[2px] p-[10px] overflow-y-scroll bg-amber-50'>
                 {
                     chat.map((a, b)=>{
                         return (
@@ -153,9 +166,9 @@ const Home = () => {
             </div>
             {
                 selectedUser ? 
-                <div className='w-full h-[10%] flex justify-between items-center border'>
-                    <input type="text" placeholder='Enter your message' className='w-[80%] h-[80%] border box-border rounded-[8px] px-4 outline-blue-600' name='message' value={message} onChange={(e)=>setMessage(e.target.value)}/>
-                    <button className='w-[100px] h-[80%] border rounded-[8px] bg-blue-600 text-white font-semibold text-xl' onClick={send}>Send</button>
+                <div className='w-full h-[10%] flex justify-between items-center border bg-fuchsia-50'>
+                    <input type="text" placeholder='Enter your message' className='w-[80%] h-[80%] border box-border rounded-[8px] px-4 outline-blue-600' name='message' value={message} onChange={(e)=>setMessage(e.target.value)} onKeyDown={handleSend}/>
+                    <button className='w-[100px] h-[80%] border rounded-[8px] bg-blue-500 text-white font-medium text-xl' onClick={send}>Send</button>
                 </div>
                 :
                 null
