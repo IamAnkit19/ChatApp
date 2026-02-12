@@ -13,7 +13,7 @@ const initSocket = require('./sockets/socket');
 db();
 
 app.use(cors({
-    origin:"http://localhost:5173"
+    origin:["http://localhost:5173", "https://iridescent-frangipane-adc610.netlify.app"]
 }));
 app.use(express.json())
 app.use('/api',router);
@@ -25,7 +25,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors:{
-        origin:"http://localhost:5173"
+        origin:["http://localhost:5173", "https://iridescent-frangipane-adc610.netlify.app"]
     }
 })
 
