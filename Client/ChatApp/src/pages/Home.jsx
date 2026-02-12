@@ -3,7 +3,7 @@ import React, { useEffect, useState, } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { createSocket } from '../socket';
 
-const API_BASE_URL = "http://localhost:4000";
+const API_BASE_URL = "https://chatapp-sgv7.onrender.com";
 
 const Home = () => {
     const [userData, setUserData] = useState({});

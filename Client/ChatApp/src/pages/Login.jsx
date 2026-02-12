@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
 
+const API_BASE_URL = "https://chatapp-sgv7.onrender.com";
+
 const Login = () => {
   let [userData, setUserData] = useState({
     email:"",
@@ -14,7 +16,7 @@ const Login = () => {
   }
   const submit = async ()=>{
     try{
-      let res = await axios.post('http://localhost:4000/api/login',userData);
+      let res = await axios.post(`${API_BASE_URL}/api/login`,userData);
       if(res.status == 200){
         setUserData({
           email:"",
